@@ -65,6 +65,7 @@ namespace Mono.Ssdp.Internal
         public TimeoutDispatcher()
         {
             Thread t = new Thread(TimerThread);
+            t.Name = "MonoTorrent TimeoutDispatcher";
             t.IsBackground = true;
             t.Start();
         }

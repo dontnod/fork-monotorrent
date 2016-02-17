@@ -152,6 +152,7 @@ namespace MonoTorrent.Client
         public MainLoop(string name)
         {
             thread = new Thread(Loop);
+            thread.Name = "MonoTorrent " + name;
             thread.IsBackground = true;
             thread.Start();
         }
