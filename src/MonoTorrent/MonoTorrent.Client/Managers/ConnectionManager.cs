@@ -641,6 +641,11 @@ namespace MonoTorrent.Client
             // Remove the peer from the lists so we can start connecting to him
             peer = manager.Peers.AvailablePeers[i];
             manager.Peers.AvailablePeers.RemoveAt(i);
+
+            // Do not try to connect to ourselves
+            if (peer.ConnectionUri.Host == manager.Engine.Listener.Endpoint.Address.ToString()
+                 && peer.ConnectionUri.Port == manager.Engine.Listener.Endpoint.Port)
+                return false;
             
             if (ShouldBanPeer(peer))
                 return false;
