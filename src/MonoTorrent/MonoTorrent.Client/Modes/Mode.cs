@@ -543,8 +543,7 @@ namespace MonoTorrent.Client
 
         void DownloadLogic(int counter)
         {
-            // FIXME: Hardcoded 15kB/sec - is this ok?
-            if ((DateTime.Now - manager.StartTime) > TimeSpan.FromMinutes(1) && manager.Monitor.DownloadSpeed < 15 * 1024)
+            if ((DateTime.Now - manager.StartTime) > manager.Settings.WebSeedDelay && manager.Monitor.DownloadSpeed < manager.Settings.WebSeedSpeedTrigger)
             {
                 foreach (string s in manager.Torrent.GetRightHttpSeeds)
                 {

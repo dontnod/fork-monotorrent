@@ -159,6 +159,22 @@ namespace MonoTorrent.Client
         }
         private bool useDht = true;
 
+        /// <summary>The delay before a torrent will start using web seeds.</summary>
+        public TimeSpan WebSeedDelay
+        {
+            get { return this.webSeedDelay; }
+            set { this.webSeedDelay = value; }
+        }
+        private TimeSpan webSeedDelay = TimeSpan.FromMinutes(1);
+
+        /// <summary>The download speed under which a torrent will start using web seeds.</summary>
+        public int WebSeedSpeedTrigger
+        {
+            get { return this.webSeedSpeedTrigger; }
+            set { this.webSeedSpeedTrigger = value; }
+        }
+        private int webSeedSpeedTrigger = 15 * 1024;
+
         #endregion
 
 
