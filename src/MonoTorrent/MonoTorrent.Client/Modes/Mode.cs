@@ -617,6 +617,7 @@ namespace MonoTorrent.Client.Modes
                     if (connection == null)
                         continue;
                     connection.Manager = Manager;
+                    connection.AuthorizationHeaderCallback = Manager.Settings.HttpAuthorizationHeaderCallback;
 
                     var id = new PeerId (peer, connection, Manager.Bitfield.Clone ().SetAll (true));
                     id.BitField.SetAll (true);

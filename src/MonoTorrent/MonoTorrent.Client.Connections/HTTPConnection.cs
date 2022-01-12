@@ -42,6 +42,8 @@ using ReusableTasks;
 
 namespace MonoTorrent.Client.Connections
 {
+    public delegate string HttpConnectionAuthorizationHeader(Uri uri);
+
     sealed class HttpConnection : IConnection2
     {
         static int webSeedId;
@@ -104,6 +106,8 @@ namespace MonoTorrent.Client.Connections
         TaskCompletionSource<object> SendResult { get; set; }
 
         public Uri Uri { get; }
+
+        public HttpConnectionAuthorizationHeader AuthorizationHeaderCallback { get; set; }  = null;
 
         Queue<KeyValuePair<WebRequest, int>> WebRequests { get; } = new Queue<KeyValuePair<WebRequest, int>> ();
 
@@ -309,21 +313,27 @@ namespace MonoTorrent.Client.Connections
                 if (startOffset >= file.Length) {
                     startOffset -= file.Length;
                     endOffset -= file.Length;
-                }
-                // We want data from the end of the current file and from the next few files
-                else if (endOffset >= file.Length) {
+                } else {
                     var request = (HttpWebRequest) WebRequest.Create (u);
-                    request.AddRange (startOffset, file.Length - 1);
-                    WebRequests.Enqueue (new KeyValuePair<WebRequest, int> (request, (int) (file.Length - startOffset)));
-                    startOffset = 0;
-                    endOffset -= file.Length;
-                }
-                // All the data we want is from within this file
-                else {
-                    var request = (HttpWebRequest) WebRequest.Create (u);
-                    request.AddRange (startOffset, endOffset - 1);
-                    WebRequests.Enqueue (new KeyValuePair<WebRequest, int> (request, (int) (endOffset - startOffset)));
-                    endOffset = 0;
+                    if (AuthorizationHeaderCallback != null) {
+                        string authorizationHeader = AuthorizationHeaderCallback (u);
+                        if (!string.IsNullOrEmpty(authorizationHeader)) {
+                            request.Headers[HttpRequestHeader.Authorization] = authorizationHeader;
+                        }
+                    }
+                    // We want data from the end of the current file and from the next few files
+                    if (endOffset >= file.Length) {
+                        request.AddRange (startOffset, file.Length - 1);
+                        WebRequests.Enqueue (new KeyValuePair<WebRequest, int> (request, (int) (file.Length - startOffset)));
+                        startOffset = 0;
+                        endOffset -= file.Length;
+                    }
+                    // All the data we want is from within this file
+                    else {
+                        request.AddRange (startOffset, endOffset - 1);
+                        WebRequests.Enqueue (new KeyValuePair<WebRequest, int> (request, (int) (endOffset - startOffset)));
+                        endOffset = 0;
+                    }
                 }
             }
         }

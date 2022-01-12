@@ -29,6 +29,7 @@
 
 using System;
 
+using MonoTorrent.Client.Connections;
 using MonoTorrent.Dht;
 
 namespace MonoTorrent.Client
@@ -105,6 +106,12 @@ namespace MonoTorrent.Client
         /// The download speed under which a torrent will start using web seeds.
         /// </summary>
         public int WebSeedSpeedTrigger { get; set; } = 15 * 1024;
+
+        /// <summary>
+        /// A callback used to provide authorization header to WebSeed HttpConnections if necessary
+        /// URI target is provided and null or an empty string can be returned to ignore the header
+        /// </summary>
+        public HttpConnectionAuthorizationHeader HttpAuthorizationHeaderCallback { get; set; } = null;
 
         /// <summary>
         /// The time, in seconds, the inactivity manager should wait until it can consider a peer eligible for disconnection.  Peers are disconnected only if they have not provided
